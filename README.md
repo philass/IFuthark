@@ -1,0 +1,3 @@
+#IFuthark
+
+A simple Futhark kernel for IPython...

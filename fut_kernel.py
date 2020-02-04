@@ -3,7 +3,7 @@ Futhark Wrapper Kernel
 """
 
 from ipykernel.kernelbase import Kernel
-
+from pexpect.replwrap import REPLWrapper
 class FutharkKernel(Kernel):
   """
   Implementation of the Method and Attributes
@@ -22,11 +22,18 @@ class FutharkKernel(Kernel):
 
   banner = "Futhark Kernel"
 
- 
+  def __init__(self, **kwargs):
+    Kernel.__init__(self, **kwargs)
+    self._repl()
+
+  def _repl(self):
+    self.repl = REPLWrapper("futhark repl", "]>", None)
+    
   def do_execute(self, code, silent, store_history=True, user_expressions=None,
                  allow_stdin=False):
     if not silent:
-      stream_content = {'name': 'stdout', 'text': code}
+      output = self.repl.run_command(code)
+      stream_content = {'name': 'stdout', 'text': output}
       self.send_response(self.iopub_socket, 'stream', stream_content)
 
     return {'status': 'ok',
